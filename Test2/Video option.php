@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Flatsome Product Gallery Video
  * Description: Add video support to the WooCommerce product gallery with Flatsome theme compatibility.
- * Version: 1.0
+ * Version: 1.1
  * Author: You
  */
 
@@ -12,14 +12,14 @@ if (!defined('ABSPATH')) exit;
 add_action('admin_enqueue_scripts', function($hook){
     if (!in_array($hook, ['post.php', 'post-new.php'])) return;
     wp_enqueue_media();
-    wp_enqueue_script('fpgv-admin', plugin_dir_url(__FILE__) . 'admin.js', ['jquery'], '1.0', true);
+    wp_enqueue_script('fpgv-admin', plugin_dir_url(__FILE__) . 'admin.js', ['jquery'], '1.1', true);
 });
 
 // Enqueue frontend CSS and JS only on single product page
 add_action('wp_enqueue_scripts', function(){
     if (!is_product()) return;
     wp_enqueue_style('fpgv-css', plugin_dir_url(__FILE__) . 'style.css');
-    wp_enqueue_script('fpgv-frontend', plugin_dir_url(__FILE__) . 'frontend.js', ['jquery'], '1.0', true);
+    wp_enqueue_script('fpgv-frontend', plugin_dir_url(__FILE__) . 'frontend.js', ['jquery'], '1.1', true);
 });
 
 // Add custom meta fields in product edit page
@@ -58,12 +58,12 @@ add_action('woocommerce_process_product_meta', function($post_id){
 // Add video to product gallery by modifying the gallery attachment IDs
 add_filter('woocommerce_product_get_gallery_image_ids', function($attachment_ids, $product) {
     $video_id = get_post_meta($product->get_id(), 'fpgv_video_id', true);
-    
+
     if ($video_id) {
         // Add a special marker for the video position
         $attachment_ids[] = 'video_' . $video_id;
     }
-    
+
     return $attachment_ids;
 }, 10, 2);
 
@@ -98,20 +98,20 @@ add_filter('woocommerce_single_product_image_thumbnail_html', function($html, $a
             esc_url($video_url),
             esc_attr($video_type)
         );
-        
+
         return $html;
     }
-    
+
     return $html;
 }, 10, 2);
 
 // Inject video data for frontend JavaScript
 add_action('wp_footer', function(){
     if (!is_product()) return;
-    
+
     $post_id = get_the_ID();
     $video_id = get_post_meta($post_id, 'fpgv_video_id', true);
-    
+
     if ($video_id) {
         $thumb_id = get_post_meta($post_id, 'fpgv_thumb_id', true);
         $video_url = wp_get_attachment_url($video_id);
@@ -134,13 +134,8 @@ add_action('wp_footer', function(){
     }
 });
 
-// Tell Flatsome to use our overridden template
-add_filter( 'flatsome_override_templates', function( $paths ) {
-    $paths['single-product/product-image.php'] = plugin_dir_path( __FILE__ ) . 'overrides/woocommerce/single-product/product-image.php';
+// Correct the template override path for Flatsome
+add_filter('flatsome_override_templates', function($paths) {
+    $paths['single-product/product-image.php'] = plugin_dir_path(__FILE__) . 'overrides/woocommerce/single-product/product-image.php';
     return $paths;
-});
-
-add_action('wp_enqueue_scripts', function(){
-  if (!is_product()) return;
-  wp_enqueue_script('fpgv-frontend', plugin_dir_url(__FILE__).'frontend.js', ['jquery'], '1.0', true);
 });

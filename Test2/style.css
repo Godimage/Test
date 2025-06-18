@@ -1,8 +1,11 @@
-/* Video slide styling */
+/* General video slide styling */
 .fpgv-video-slide {
     position: relative;
     width: 100%;
     height: auto;
+    display: block;
+    margin-bottom: 0;
+    z-index: 1;
 }
 
 .fpgv-video-slide video {
@@ -12,41 +15,8 @@
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     background-color: #000;
-}
-
-.fpgv-video-slide a {
-    display: block;
-    position: relative;
-    width: 100%;
-    height: auto;
-}
-
-/* Ensure video slides match image slides */
-.woocommerce-product-gallery__wrapper .fpgv-video-slide {
-    display: block;
-    width: 100%;
-    margin-bottom: 0;
-}
-
-/* Video controls styling */
-.fpgv-video-slide video::-webkit-media-controls-panel {
-    background-color: rgba(0, 0, 0, 0.8);
-}
-
-.fpgv-video-slide video::-webkit-media-controls-play-button,
-.fpgv-video-slide video::-webkit-media-controls-pause-button {
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 50%;
-}
-
-.fpgv-video-slide video::-webkit-media-controls-timeline {
-    background-color: rgba(255, 255, 255, 0.3);
-}
-
-.fpgv-video-slide video::-webkit-media-controls-current-time-display,
-.fpgv-video-slide video::-webkit-media-controls-time-remaining-display {
-    color: white;
-    font-size: 12px;
+    object-fit: cover;
+    aspect-ratio: 16/9;
 }
 
 /* Lightbox video styling */
@@ -67,13 +37,11 @@
 
 /* Desktop specific styles */
 @media (min-width: 769px) {
-    /* Ensure proper spacing and sizing for desktop */
     .fpgv-video-slide video {
         border-radius: 10px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
-    
-    /* Desktop thumbnail styling */
+
     .product-gallery-stacked-thumbnails .col {
         margin-bottom: 10px;
         border: 2px solid transparent;
@@ -81,25 +49,19 @@
         overflow: hidden;
         transition: border-color 0.3s ease, opacity 0.3s ease;
     }
-    
+
     .product-gallery-stacked-thumbnails .col.active {
         border-color: #007cba;
         opacity: 1;
     }
-    
+
     .product-gallery-stacked-thumbnails .col:not(.active) {
         opacity: 0.7;
     }
-    
+
     .product-gallery-stacked-thumbnails .col:hover {
         opacity: 1;
         border-color: #005a87;
-    }
-    
-    /* Ensure video doesn't interfere with desktop layout */
-    .woocommerce-product-gallery__wrapper .fpgv-video-slide {
-        position: relative;
-        z-index: 1;
     }
 }
 
@@ -109,37 +71,23 @@
         border-radius: 6px;
         box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    
-    /* Mobile video controls - larger touch targets */
+
     .fpgv-video-slide video::-webkit-media-controls-play-button,
     .fpgv-video-slide video::-webkit-media-controls-pause-button {
         width: 48px;
         height: 48px;
         background-color: rgba(255, 255, 255, 0.95);
     }
-    
-    .fpgv-video-slide video::-webkit-media-controls-timeline {
-        height: 8px;
-    }
-    
-    .fpgv-video-slide video::-webkit-media-controls-start-playback-button {
-        width: 60px;
-        height: 60px;
-        background-color: rgba(255, 255, 255, 0.95);
-        border-radius: 50%;
-    }
-    
-    /* Mobile gallery slider adjustments */
+
     .woocommerce-product-gallery__wrapper.flickity-enabled .fpgv-video-slide {
         width: 100%;
         margin-right: 10px;
     }
-    
+
     .flickity-slider .fpgv-video-slide {
         width: 100%;
     }
-    
-    /* Mobile thumbnail styling */
+
     .product-gallery-thumbnails .col {
         border: 2px solid transparent;
         border-radius: 4px;
@@ -148,93 +96,26 @@
         min-height: 60px;
         min-width: 60px;
     }
-    
+
     .product-gallery-thumbnails .col.active {
         border-color: #007cba;
         opacity: 1;
     }
-    
+
     .product-gallery-thumbnails .col:not(.active) {
         opacity: 0.7;
     }
-    
+
     .product-gallery-thumbnails .col a {
         display: block;
         padding: 2px;
         min-height: 44px;
         min-width: 44px;
     }
-    
-    /* Hide desktop thumbnails on mobile */
+
     .product-gallery-stacked-thumbnails {
         display: none !important;
     }
-}
-
-/* Ensure proper video aspect ratio and object fit */
-.fpgv-video-slide video {
-    aspect-ratio: 16/9;
-    object-fit: cover;
-    background-color: #000;
-}
-
-/* Loading state for videos */
-.fpgv-video-slide video[poster] {
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-/* Flickity slider specific adjustments */
-.flickity-enabled .fpgv-video-slide {
-    width: 100%;
-}
-
-.flickity-enabled .fpgv-video-slide video {
-    width: 100%;
-    height: auto;
-    display: block;
-}
-
-/* Active state for gallery items */
-.woocommerce-product-gallery__wrapper .is-selected.fpgv-video-slide {
-    opacity: 1;
-}
-
-.woocommerce-product-gallery__wrapper .fpgv-video-slide:not(.is-selected) {
-    opacity: 0.8;
-}
-
-/* Ensure video controls are accessible */
-.fpgv-video-slide video::-webkit-media-controls {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Fix for iOS Safari video controls */
-.fpgv-video-slide video {
-    -webkit-playsinline: true;
-    playsinline: true;
-}
-
-/* Gallery wrapper adjustments */
-.woocommerce-product-gallery__wrapper {
-    position: relative;
-}
-
-.woocommerce-product-gallery__wrapper .woocommerce-product-gallery__image {
-    position: relative;
-    width: 100%;
-    height: auto;
-}
-
-/* Ensure proper z-index layering */
-.fpgv-video-slide {
-    z-index: 1;
-}
-
-.woocommerce-product-gallery__wrapper {
-    z-index: 2;
 }
 
 /* Responsive adjustments for very small screens */
@@ -244,12 +125,7 @@
         width: 40px;
         height: 40px;
     }
-    
-    .fpgv-video-slide video::-webkit-media-controls-start-playbox-button {
-        width: 50px;
-        height: 50px;
-    }
-    
+
     .fpgv-video-lightbox video {
         max-height: 85vh;
     }
@@ -264,34 +140,8 @@
     border-radius: 2px;
 }
 
-/* Fix any potential layout issues */
-.woocommerce-product-gallery__wrapper .fpgv-video-slide,
-.woocommerce-product-gallery__wrapper .woocommerce-product-gallery__image {
-    box-sizing: border-box;
-}
-
 /* Ensure smooth transitions */
 .fpgv-video-slide,
 .fpgv-video-slide video {
     transition: opacity 0.3s ease;
 }
-
-/* Hide video slides that are not active on desktop */
-@media (min-width: 769px) {
-    .woocommerce-product-gallery__wrapper .fpgv-video-slide {
-        display: none;
-    }
-    
-    .woocommerce-product-gallery__wrapper .fpgv-video-slide.active,
-    .woocommerce-product-gallery__wrapper .fpgv-video-slide:target {
-        display: block;
-    }
-}
-
-/* Ensure mobile slider shows all slides */
-@media (max-width: 768px) {
-    .woocommerce-product-gallery__wrapper.flickity-enabled .woocommerce-product-gallery__image {
-        display: block !important;
-    }
-}
-
