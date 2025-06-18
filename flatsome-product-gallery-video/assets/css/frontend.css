@@ -1,0 +1,130 @@
+/* Frontend styles for video integration */
+.fpgv-video-thumbnail {
+    position: relative;
+    display: inline-block;
+}
+
+.fpgv-play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.fpgv-video-thumbnail:hover .fpgv-play-button svg circle {
+    fill: rgba(0,0,0,0.9);
+}
+
+/* Video modal styles */
+.fpgv-video-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8);
+}
+
+.fpgv-video-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 90%;
+    max-height: 90%;
+}
+
+.fpgv-video-modal-content video {
+    width: 100%;
+    height: auto;
+    max-width: 800px;
+}
+
+.fpgv-video-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10000;
+}
+
+.fpgv-video-close:hover {
+    color: #ccc;
+}
+
+/* Flatsome specific styles */
+.flex-control-thumbs .fpgv-thumb-play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 16px;
+    background: rgba(0,0,0,0.7);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    pointer-events: none;
+}
+
+.flex-control-thumbs li {
+    position: relative;
+}
+
+/* Auto resize styles */
+.fpgv-auto-resize video {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+}
+
+/* Stack layout specific styles */
+.product-gallery-stack .fpgv-video-thumbnail {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.product-gallery-stack .fpgv-video-thumbnail img {
+    width: 100%;
+    height: auto;
+}
+
+/* Featured 2 columns layout specific styles */
+.product-gallery.featured-2-columns .fpgv-video-thumbnail {
+    flex: 1;
+    margin: 5px;
+}
+
+.product-gallery.featured-2-columns .fpgv-video-thumbnail img {
+    width: 100%;
+    height: auto;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .fpgv-video-modal-content {
+        max-width: 95%;
+        max-height: 95%;
+    }
+    
+    .fpgv-play-button svg {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .flex-control-thumbs .fpgv-thumb-play-icon {
+        width: 24px;
+        height: 24px;
+        line-height: 24px;
+        font-size: 12px;
+    }
+}
