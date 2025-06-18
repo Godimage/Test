@@ -15,10 +15,11 @@ add_action('admin_enqueue_scripts', function($hook){
     wp_enqueue_script('fpgv-admin', plugin_dir_url(__FILE__) . 'admin.js', ['jquery'], '1.0', true);
 });
 
-// Enqueue frontend CSS only on single product page
+// Enqueue frontend CSS and JS only on single product page
 add_action('wp_enqueue_scripts', function(){
     if (!is_product()) return;
     wp_enqueue_style('fpgv-css', plugin_dir_url(__FILE__) . 'style.css');
+    wp_enqueue_script('fpgv-frontend', plugin_dir_url(__FILE__) . 'frontend.js', ['jquery'], '1.0', true);
 });
 
 // Add custom meta fields in product edit page
@@ -54,29 +55,82 @@ add_action('woocommerce_process_product_meta', function($post_id){
     update_post_meta($post_id, 'fpgv_auto_resize', isset($_POST['fpgv_auto_resize']) ? 'yes' : 'no');
 });
 
-// Add video slide to product gallery
-add_filter('woocommerce_single_product_image_thumbnail_html', function($html, $attachment_id){
-    static $done = false;
-    if ($done) return $html;
+// Add video to product gallery by modifying the gallery attachment IDs
+add_filter('woocommerce_product_get_gallery_image_ids', function($attachment_ids, $product) {
+    $video_id = get_post_meta($product->get_id(), 'fpgv_video_id', true);
+    
+    if ($video_id) {
+        // Add a special marker for the video position
+        $attachment_ids[] = 'video_' . $video_id;
+    }
+    
+    return $attachment_ids;
+}, 10, 2);
 
-    $post_id = get_the_ID();
-    $video_id = get_post_meta($post_id, 'fpgv_video_id', true);
-    if ($video_id){
+// Modify the gallery image HTML to include video
+add_filter('woocommerce_single_product_image_thumbnail_html', function($html, $attachment_id) {
+    // Check if this is our video marker
+    if (is_string($attachment_id) && strpos($attachment_id, 'video_') === 0) {
+        $video_id = str_replace('video_', '', $attachment_id);
+        $post_id = get_the_ID();
         $thumb_id = get_post_meta($post_id, 'fpgv_thumb_id', true);
-        $auto = get_post_meta($post_id, 'fpgv_auto_resize', true) === 'yes';
+        $auto_resize = get_post_meta($post_id, 'fpgv_auto_resize', true) === 'yes';
         $video_url = wp_get_attachment_url($video_id);
         $thumb_url = $thumb_id ? wp_get_attachment_url($thumb_id) : '';
-        $style = $auto ? 'style="max-width:100%"' : '';
+        $video_type = wp_check_filetype($video_url)['type'];
 
-        $video_html = sprintf(
-            '<div class="fpgv-video-slide ux-gallery-slide"><video controls %s poster="%s"><source src="%s" type="video/%s"></video></div>',
-            $style,
+        // Create video slide that matches WooCommerce gallery structure
+        $html = sprintf(
+            '<div data-thumb="%s" data-thumb-alt="Video" class="woocommerce-product-gallery__image fpgv-video-slide">
+                <a href="%s" data-video-url="%s" data-video-type="%s" data-video="true">
+                    <video controls %s poster="%s" preload="metadata" style="width:100%%; height:auto;" playsinline>
+                        <source src="%s" type="%s">
+                        Your browser does not support the video tag.
+                    </video>
+                </a>
+            </div>',
             esc_url($thumb_url),
             esc_url($video_url),
-            esc_attr(pathinfo($video_url, PATHINFO_EXTENSION))
+            esc_url($video_url),
+            esc_attr($video_type),
+            $auto_resize ? 'style="max-width:100%; height:auto;"' : '',
+            esc_url($thumb_url),
+            esc_url($video_url),
+            esc_attr($video_type)
         );
-        $done = true;
-        return $video_html . $html;
+        
+        return $html;
     }
+    
     return $html;
 }, 10, 2);
+
+// Inject video data for frontend JavaScript
+add_action('wp_footer', function(){
+    if (!is_product()) return;
+    
+    $post_id = get_the_ID();
+    $video_id = get_post_meta($post_id, 'fpgv_video_id', true);
+    
+    if ($video_id) {
+        $thumb_id = get_post_meta($post_id, 'fpgv_thumb_id', true);
+        $video_url = wp_get_attachment_url($video_id);
+        $thumb_url = $thumb_id ? wp_get_attachment_url($thumb_id) : '';
+        $video_type = wp_check_filetype($video_url)['type'];
+        ?>
+        <script type="text/javascript">
+        jQuery(document).ready(function($) {
+            // Add video data to gallery
+            if (typeof window.fpgvVideoData === 'undefined') {
+                window.fpgvVideoData = {
+                    videoUrl: '<?php echo esc_js($video_url); ?>',
+                    thumbUrl: '<?php echo esc_js($thumb_url); ?>',
+                    videoType: '<?php echo esc_js($video_type); ?>'
+                };
+            }
+        });
+        </script>
+        <?php
+    }
+});
+
