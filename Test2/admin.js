@@ -35,3 +35,18 @@ jQuery(function($){
     });
   }
 });
+
+jQuery(function($){
+  function reinitGallery() {
+    if(typeof UXBuilder !== 'undefined' && typeof UXSlider === 'function') {
+      $('.product-gallery').each(function(){
+        var slider = $(this).data('xuSlider');
+        if(slider) slider.destroy();
+      });
+      UXSlider.init($('.product-gallery'));
+      UXLightbox.init($('.product-gallery'));
+    }
+  }
+
+  $(window).on('load', reinitGallery);
+});

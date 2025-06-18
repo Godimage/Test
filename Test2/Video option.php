@@ -134,3 +134,13 @@ add_action('wp_footer', function(){
     }
 });
 
+// Tell Flatsome to use our overridden template
+add_filter( 'flatsome_override_templates', function( $paths ) {
+    $paths['single-product/product-image.php'] = plugin_dir_path( __FILE__ ) . 'overrides/woocommerce/single-product/product-image.php';
+    return $paths;
+});
+
+add_action('wp_enqueue_scripts', function(){
+  if (!is_product()) return;
+  wp_enqueue_script('fpgv-frontend', plugin_dir_url(__FILE__).'frontend.js', ['jquery'], '1.0', true);
+});
