@@ -1,0 +1,63 @@
+/**
+ * Flatsome Product Video Gallery - Frontend Styles
+ *
+ * This stylesheet provides the necessary styles to integrate the HTML5 video
+ * seamlessly into the Flatsome theme's product gallery. It ensures the video
+ * behaves just like an image, respecting the gallery's layout and responsiveness.
+ *
+ * @package    Flatsome_Product_Video_Gallery
+ * @author     Neo
+ * @version    1.0
+ */
+
+/*
+ * 1. Video Wrapper Context
+ * --------------------------------------------------------------------------
+ * The standard gallery item link (`<a>` tag) that wraps our video needs to
+ * establish a positioning context. This ensures that the absolutely positioned
+ * video element inside it is contained correctly.
+ *
+ * Flatsome's default styles already handle the block-level display, but explicitly
+ * setting `position: relative` is a robust way to guarantee the context.
+ */
+.woocommerce-product-gallery .woocommerce-product-gallery__image > a {
+    position: relative;
+    display: block; /* Ensures the link fills the container */
+}
+
+/*
+ * 2. Core Video Styling
+ * --------------------------------------------------------------------------
+ * These rules make the `<video>` element fill its container and visually
+ * mimic the behavior of the product images in the gallery.
+ */
+.woocommerce-product-gallery .fpvg-video {
+    /*
+     * Position the video absolutely to overlay its container (the `<a>` tag).
+     * This takes it out of the normal document flow, allowing it to perfectly
+     * fill the space defined by its wrapper.
+     */
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    /*
+     * Force the video to fill 100% of the width and height of its
+     * relative parent (`<a>`), ensuring it's fully responsive.
+     */
+    width: 100%;
+    height: 100%;
+
+    /*
+     * **CRITICAL PROPERTY**: This is the key to visual consistency.
+     * `object-fit: cover` makes the video scale to cover the entire
+     * container while maintaining its aspect ratio. The video will be
+     * clipped (cropped) if its aspect ratio doesn't match the container's,
+     * exactly like how background images or Flatsome's gallery images behave.
+     */
+    object-fit: cover;
+    object-position: center; /* Center the video content within its frame. */
+
+    /* Ensure the video is visible and has no extra spacing. */
+    display: block;
+}

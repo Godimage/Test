@@ -1,0 +1,85 @@
+/**
+ * Admin-side CSS for the Flatsome Product Video Gallery plugin.
+ *
+ * This file contains styles for the "Product Gallery Video" meta box
+ * on the WooCommerce product edit screen, ensuring a clean and
+ * consistent user interface within the WordPress admin panel.
+ *
+ * @version 1.0
+ */
+
+/*
+ * General spacing for elements within the meta box.
+ * This provides consistent vertical rhythm between sections.
+ */
+#fpvg-meta-box-container > div {
+    margin-bottom: 15px;
+}
+
+#fpvg-meta-box-container > div:last-child {
+    margin-bottom: 0;
+}
+
+/*
+ * Video Preview Wrapper & Video Element
+ * Styles the container for the video preview and the video itself.
+ */
+.fpvg-video-preview-wrapper {
+    border: 1px solid #ddd;
+    background-color: #f0f0f1;
+    padding: 5px;
+    box-sizing: border-box;
+    /* The wrapper is hidden/shown by JS. No display property needed here. */
+}
+
+.fpvg-video-preview-wrapper video {
+    width: 100%;
+    height: auto;
+    display: block; /* Prevents extra space below the video element */
+}
+
+/*
+ * Action Buttons
+ * The buttons themselves use standard WordPress .button classes.
+ * This ensures they match the admin UI without extra styling.
+ */
+.fpvg-buttons {
+    display: flex;
+    gap: 8px; /* Provides space between the Upload and Remove buttons */
+}
+
+/*
+ * Remove Video Button Default State
+ * This button is hidden by default as per the design.
+ * The `fpvg-admin.js` script handles toggling its visibility
+ * based on whether a video is currently set.
+ */
+#fpvg_remove_video_button {
+    display: none;
+}
+
+/*
+ * Position Setting Section
+ * Styles the label, input field, and help text for the video position setting.
+ */
+.fpvg-position-setting p {
+    margin: 0; /* Resets default paragraph margin for a cleaner layout */
+}
+
+.fpvg-position-setting label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600; /* Standard WP admin label weight */
+}
+
+.fpvg-position-setting input[type="number"] {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.fpvg-position-setting small {
+    display: block;
+    margin-top: 5px;
+    color: #646970; /* Standard WordPress help text color */
+    font-style: italic;
+}
