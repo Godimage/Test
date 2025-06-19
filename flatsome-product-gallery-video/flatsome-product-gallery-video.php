@@ -1,282 +1,186 @@
 <?php
 /**
  * Plugin Name:       Flatsome Product Gallery Video
- * Plugin URI:        https://github.com/expert-analyst/flatsome-product-gallery-video
- * Description:       Adds a video to the WooCommerce product gallery for the Flatsome theme. This version fixes meta box placement, media uploader functionality, and frontend display.
- * Version:           5.0.0
+ * Plugin URI:        https://example.com/flatsome-product-gallery-video
+ * Description:       Adds a video to the Flatsome theme's product gallery using a stable, compatible integration method.
+ * Version:           2.0.0
  * Author:            Expert Analyst
- * Author URI:        https://example.com/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       flatsome-product-gallery-video
+ * Text Domain:       fvg
  * Domain Path:       /languages
- * WC requires at least: 3.0.0
- * WC tested up to: 8.9
+ * WC requires at least: 3.0
+ * WC tested up to: 8.0
  */
 
+// Prevent direct file access.
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly.
-}
-
-define( 'FVG_VERSION', '5.0.0' );
-define( 'FVG_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'FVG_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
-
-// =========================================================================
-// 1. ADMIN AREA SETUP
-// =========================================================================
-
-/**
- * Registers the meta box on the product edit screen.
- *
- * Ensures the meta box appears in the side context for correct placement.
- */
-function fvg_add_video_meta_box() {
-	add_meta_box(
-		'fvg_product_video_meta_box',
-		__( 'Product Gallery Video', 'flatsome-product-gallery-video' ),
-		'fvg_video_meta_box_html',
-		'product',
-		'side', // Fix: Places the meta box in the sidebar.
-		'default'
-	);
-}
-add_action( 'add_meta_boxes', 'fvg_add_video_meta_box' );
-
-/**
- * Renders the HTML content for the video meta box.
- *
- * Provides a user-friendly interface with media uploaders for video and thumbnail.
- *
- * @param WP_Post $post The current post object.
- */
-function fvg_video_meta_box_html( $post ) {
-	// Security nonce.
-	wp_nonce_field( 'fvg_save_product_video_meta_action', 'fvg_video_meta_nonce' );
-
-	// Get saved values.
-	$video_id     = get_post_meta( $post->ID, '_fvg_video_id', true );
-	$thumbnail_id = get_post_meta( $post->ID, '_fvg_thumbnail_id', true );
-	$auto_resize  = get_post_meta( $post->ID, '_fvg_auto_resize', true );
-
-	$video_filename      = $video_id ? basename( wp_get_attachment_url( $video_id ) ) : '';
-	$thumbnail_image_src = $thumbnail_id ? wp_get_attachment_image_url( $thumbnail_id, 'thumbnail' ) : '';
-	?>
-	<div class="fvg-meta-box-container">
-		<!-- Video Uploader Section -->
-		<div class="fvg-field-group">
-			<input type="hidden" id="_fvg_video_id" name="_fvg_video_id" value="<?php echo esc_attr( $video_id ); ?>">
-			<div id="fvg-video-preview" class="fvg-preview-container">
-				<?php if ( $video_id ) : ?>
-					<span class="fvg-file-name"><?php echo esc_html( $video_filename ); ?></span>
-				<?php else : ?>
-					<span class="fvg-placeholder"><?php _e( 'No video selected', 'flatsome-product-gallery-video' ); ?></span>
-				<?php endif; ?>
-			</div>
-			<div class="fvg-button-wrapper">
-				<button type="button" class="button" id="fvg_upload_video_button"><?php _e( 'Upload Video', 'flatsome-product-gallery-video' ); ?></button>
-				<button type="button" class="button-link-delete" id="fvg_remove_video_button" style="<?php echo $video_id ? '' : 'display:none;'; ?>"><?php _e( 'Remove', 'flatsome-product-gallery-video' ); ?></button>
-			</div>
-		</div>
-
-		<!-- Thumbnail Uploader Section -->
-		<div class="fvg-field-group">
-			<input type="hidden" id="_fvg_thumbnail_id" name="_fvg_thumbnail_id" value="<?php echo esc_attr( $thumbnail_id ); ?>">
-			<div id="fvg-thumbnail-preview" class="fvg-preview-container">
-				<?php if ( $thumbnail_id ) : ?>
-					<img src="<?php echo esc_url( $thumbnail_image_src ); ?>" alt="<?php _e( 'Thumbnail Preview', 'flatsome-product-gallery-video' ); ?>">
-				<?php else : ?>
-					<span class="fvg-placeholder"><?php _e( 'No thumbnail selected', 'flatsome-product-gallery-video' ); ?></span>
-				<?php endif; ?>
-			</div>
-			<p class="description"><?php _e( 'This image appears in the gallery thumbnails.', 'flatsome-product-gallery-video' ); ?></p>
-			<div class="fvg-button-wrapper">
-				<button type="button" class="button" id="fvg_upload_thumbnail_button"><?php _e( 'Upload Thumbnail', 'flatsome-product-gallery-video' ); ?></button>
-				<button type="button" class="button-link-delete" id="fvg_remove_thumbnail_button" style="<?php echo $thumbnail_id ? '' : 'display:none;'; ?>"><?php _e( 'Remove', 'flatsome-product-gallery-video' ); ?></button>
-			</div>
-		</div>
-
-		<!-- Auto Resize Checkbox -->
-		<div class="fvg-field-group">
-			<label for="_fvg_auto_resize">
-				<input type="checkbox" id="_fvg_auto_resize" name="_fvg_auto_resize" value="yes" <?php checked( $auto_resize, 'yes' ); ?>>
-				<?php _e( 'Auto-resize video (cover area)', 'flatsome-product-gallery-video' ); ?>
-			</label>
-		</div>
-	</div>
-	<?php
+	exit;
 }
 
 /**
- * Enqueues scripts and styles for the admin area.
- *
- * This function loads the WordPress media uploader scripts and the plugin's
- * admin script only on product edit pages.
- *
- * @param string $hook The current admin page hook.
+ * Main plugin class for Flatsome Product Gallery Video.
  */
-function fvg_enqueue_admin_scripts( $hook ) {
-	global $post;
-	if ( ( 'post.php' === $hook || 'post-new.php' === $hook ) && isset( $post->post_type ) && 'product' === $post->post_type ) {
-		// Enqueue WordPress media scripts.
-		wp_enqueue_media();
-		// Enqueue the plugin's admin script to handle the media uploader logic.
-		wp_enqueue_script(
-			'fvg-admin-script',
-			FVG_PLUGIN_URL . 'js/admin.js',
-			array( 'jquery', 'wp-mediaelement' ),
-			FVG_VERSION,
-			true
+final class Flatsome_Product_Gallery_Video {
+
+	private static $instance;
+
+	public static function get_instance() {
+		if ( ! isset( self::$instance ) ) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
+
+	private function __construct() {
+		// Admin hooks
+		add_action( 'add_meta_boxes', array( $this, 'add_video_meta_box' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
+		add_action( 'save_post_product', array( $this, 'save_video_meta_data' ) );
+
+		// Frontend integration hooks
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_assets' ) );
+		add_filter( 'woocommerce_product_get_gallery_image_ids', array( $this, 'add_video_thumbnail_to_gallery' ), 20, 2 );
+		add_filter( 'woocommerce_single_product_image_thumbnail_html', array( $this, 'add_video_data_to_thumbnail_html' ), 20, 2 );
+	}
+
+	public function add_video_meta_box() {
+		add_meta_box(
+			'fvg_video_meta_box',
+			__( 'Product Gallery Video', 'fvg' ),
+			array( $this, 'render_video_meta_box' ),
+			'product',
+			'side',
+			'low'
 		);
 	}
-}
-add_action( 'admin_enqueue_scripts', 'fvg_enqueue_admin_scripts' );
 
+	public function render_video_meta_box( $post ) {
+		wp_nonce_field( 'fvg_save_video_meta_data', 'fvg_video_nonce' );
 
-/**
- * Saves the product video meta data.
- *
- * Triggered when a product is saved. Performs security checks and sanitizes data.
- *
- * @param int $post_id The ID of the post being saved.
- */
-function fvg_save_product_video_meta( $post_id ) {
-	// Verify nonce.
-	if ( ! isset( $_POST['fvg_video_meta_nonce'] ) || ! wp_verify_nonce( $_POST['fvg_video_meta_nonce'], 'fvg_save_product_video_meta_action' ) ) {
-		return;
-	}
-	// Check for autosave.
-	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
-		return;
-	}
-	// Check user permissions.
-	if ( ! current_user_can( 'edit_post', $post_id ) ) {
-		return;
-	}
-	// Only save for 'product' post type.
-	if ( 'product' !== get_post_type( $post_id ) ) {
-		return;
-	}
+		$video_id      = get_post_meta( $post->ID, '_fvg_video_id', true );
+		$thumbnail_id  = get_post_meta( $post->ID, '_fvg_thumbnail_id', true );
+		$auto_resize   = get_post_meta( $post->ID, '_fvg_auto_resize', true );
+		$thumbnail_url = $thumbnail_id ? wp_get_attachment_image_url( (int) $thumbnail_id, 'thumbnail' ) : '';
+		$video_filename = $video_id ? basename( wp_get_attachment_url( (int) $video_id ) ) : '';
+		?>
+		<div class="fvg-meta-box-wrapper">
+			<!-- Video File -->
+			<p>
+				<strong><?php esc_html_e( 'Video File (MP4)', 'fvg' ); ?></strong><br>
+				<span id="fvg_video_file_name"><?php echo esc_html( $video_filename ); ?></span>
+				<input type="hidden" id="fvg_video_id" name="fvg_video_id" value="<?php echo esc_attr( $video_id ); ?>" />
+				<button type="button" id="fvg_upload_video_button" class="button" style="<?php echo ! empty( $video_id ) ? 'display:none;' : ''; ?>"><?php esc_html_e( 'Upload Video', 'fvg' ); ?></button>
+				<button type="button" id="fvg_remove_video_button" class="button" style="<?php echo empty( $video_id ) ? 'display:none;' : ''; ?>"><?php esc_html_e( 'Remove Video', 'fvg' ); ?></button>
+			</p>
 
-	// Save Video ID.
-	$video_id = isset( $_POST['_fvg_video_id'] ) ? absint( $_POST['_fvg_video_id'] ) : '';
-	update_post_meta( $post_id, '_fvg_video_id', $video_id );
+			<!-- Video Thumbnail -->
+			<p>
+				<strong><?php esc_html_e( 'Video Thumbnail Image', 'fvg' ); ?></strong><br>
+				<div id="fvg_thumbnail_preview" style="margin-bottom: 5px;">
+					<?php if ( $thumbnail_url ) : ?>
+						<img src="<?php echo esc_url( $thumbnail_url ); ?>" style="max-width:100%; height:auto;" />
+					<?php endif; ?>
+				</div>
+				<input type="hidden" id="fvg_thumbnail_id" name="fvg_thumbnail_id" value="<?php echo esc_attr( $thumbnail_id ); ?>" />
+				<button type="button" id="fvg_upload_thumbnail_button" class="button" style="<?php echo ! empty( $thumbnail_id ) ? 'display:none;' : ''; ?>"><?php esc_html_e( 'Upload Thumbnail', 'fvg' ); ?></button>
+				<button type="button" id="fvg_remove_thumbnail_button" class="button" style="<?php echo empty( $thumbnail_id ) ? 'display:none;' : ''; ?>"><?php esc_html_e( 'Remove Thumbnail', 'fvg' ); ?></button>
+			</p>
 
-	// Save Thumbnail ID.
-	$thumbnail_id = isset( $_POST['_fvg_thumbnail_id'] ) ? absint( $_POST['_fvg_thumbnail_id'] ) : '';
-	update_post_meta( $post_id, '_fvg_thumbnail_id', $thumbnail_id );
-
-	// Save Auto-Resize Checkbox.
-	$auto_resize = isset( $_POST['_fvg_auto_resize'] ) && 'yes' === $_POST['_fvg_auto_resize'] ? 'yes' : 'no';
-	update_post_meta( $post_id, '_fvg_auto_resize', $auto_resize );
-}
-add_action( 'save_post', 'fvg_save_product_video_meta' );
-
-
-// =========================================================================
-// 2. FRONTEND INTEGRATION
-// =========================================================================
-
-/**
- * Enqueues frontend scripts and styles.
- *
- * Loads assets only on single product pages that have a video configured,
- * ensuring optimal performance.
- */
-function fvg_enqueue_frontend_scripts() {
-	// Crucial check to prevent errors on non-product pages.
-	if ( ! is_product() ) {
-		return;
+			<!-- Auto Resize Checkbox -->
+			<p>
+				<label for="fvg_auto_resize">
+					<input type="checkbox" id="fvg_auto_resize" name="fvg_auto_resize" value="1" <?php checked( $auto_resize, '1' ); ?> />
+					<?php esc_html_e( 'Auto Resize Video Lightbox', 'fvg' ); ?>
+				</label>
+				<span class="description" style="display: block;"><?php esc_html_e( 'Fit video to browser window.', 'fvg' ); ?></span>
+			</p>
+		</div>
+		<?php
 	}
 
-	global $product;
-	if ( ! is_a( $product, 'WC_Product' ) ) {
-		return;
+	public function save_video_meta_data( $post_id ) {
+		if ( ! isset( $_POST['fvg_video_nonce'] ) || ! wp_verify_nonce( $_POST['fvg_video_nonce'], 'fvg_save_video_meta_data' ) ) {
+			return;
+		}
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+		update_post_meta( $post_id, '_fvg_video_id', isset( $_POST['fvg_video_id'] ) ? absint( $_POST['fvg_video_id'] ) : '' );
+		update_post_meta( $post_id, '_fvg_thumbnail_id', isset( $_POST['fvg_thumbnail_id'] ) ? absint( $_POST['fvg_thumbnail_id'] ) : '' );
+		$auto_resize = isset( $_POST['fvg_auto_resize'] ) ? '1' : '0';
+		update_post_meta( $post_id, '_fvg_auto_resize', $auto_resize );
 	}
 
-	// Only load assets if a video is actually set for this product.
-	if ( get_post_meta( $product->get_id(), '_fvg_video_id', true ) ) {
-		wp_enqueue_style( 'fvg-style', FVG_PLUGIN_URL . 'css/style.css', array(), FVG_VERSION );
-		wp_enqueue_script( 'fvg-frontend-script', FVG_PLUGIN_URL . 'js/frontend.js', array( 'jquery' ), FVG_VERSION, true );
-	}
-}
-add_action( 'wp_enqueue_scripts', 'fvg_enqueue_frontend_scripts' );
-
-/**
- * Adds the video thumbnail ID to the product gallery image array.
- *
- * This ensures the thumbnail is displayed alongside other gallery images.
- *
- * @param array $image_ids Array of gallery attachment IDs.
- * @return array Modified array with the video thumbnail ID.
- */
-function fvg_add_thumbnail_to_gallery( $image_ids ) {
-	global $product;
-	if ( ! is_a( $product, 'WC_Product' ) ) {
-		return $image_ids;
+	public function enqueue_admin_assets( $hook ) {
+		global $post;
+		if ( ( 'post.php' === $hook || 'post-new.php' === $hook ) && isset( $post->post_type ) && 'product' === $post->post_type ) {
+			wp_enqueue_media();
+			wp_enqueue_script(
+				'fvg-admin-js',
+				plugin_dir_url( __FILE__ ) . 'js/admin.js',
+				array( 'jquery' ),
+				'2.0.0',
+				true
+			);
+		}
 	}
 
-	$thumbnail_id = get_post_meta( $product->get_id(), '_fvg_thumbnail_id', true );
-
-	if ( $thumbnail_id && ! in_array( $thumbnail_id, $image_ids ) ) {
-		// Add the thumbnail to the beginning of the gallery.
-		array_unshift( $image_ids, $thumbnail_id );
+	public function enqueue_frontend_assets() {
+		if ( is_product() ) {
+			wp_enqueue_style(
+				'fvg-style',
+				plugin_dir_url( __FILE__ ) . 'css/style.css',
+				array(),
+				'2.0.0'
+			);
+			wp_enqueue_script(
+				'fvg-frontend-js',
+				plugin_dir_url( __FILE__ ) . 'js/frontend.js',
+				array( 'jquery', 'flatsome-main' ),
+				'2.0.0',
+				true
+			);
+		}
 	}
 
-	return $image_ids;
-}
-add_filter( 'woocommerce_product_get_gallery_image_ids', 'fvg_add_thumbnail_to_gallery', 10, 1 );
+	public function add_video_thumbnail_to_gallery( $image_ids, $product ) {
+		if ( ! is_a( $product, 'WC_Product' ) ) {
+			return $image_ids;
+		}
+		$thumbnail_id = get_post_meta( $product->get_id(), '_fvg_thumbnail_id', true );
+		if ( ! empty( $thumbnail_id ) ) {
+			array_unshift( $image_ids, $thumbnail_id );
+		}
+		return array_unique( $image_ids );
+	}
 
-/**
- * Modifies the HTML for the video thumbnail in the gallery.
- *
- * This is the core function for the frontend integration. It identifies the
- * specific video thumbnail and replaces its standard anchor with a custom one
- * containing the necessary data attributes for the JavaScript handler.
- *
- * @param string $html          The original thumbnail HTML (including <li> wrapper).
- * @param int    $attachment_id The ID of the current thumbnail's attachment.
- * @return string The modified or original HTML.
- */
-function fvg_modify_thumbnail_html( $html, $attachment_id ) {
-	global $product;
-	if ( ! is_a( $product, 'WC_Product' ) ) {
+	public function add_video_data_to_thumbnail_html( $html, $attachment_id ) {
+		global $product;
+		if ( ! is_a( $product, 'WC_Product' ) ) {
+			return $html;
+		}
+		$video_thumbnail_id = get_post_meta( $product->get_id(), '_fvg_thumbnail_id', true );
+		if ( ! empty( $video_thumbnail_id ) && (int) $attachment_id === (int) $video_thumbnail_id ) {
+			$video_id = get_post_meta( $product->get_id(), '_fvg_video_id', true );
+			if ( empty( $video_id ) ) {
+				return $html;
+			}
+			$video_url   = wp_get_attachment_url( $video_id );
+			$auto_resize = get_post_meta( $product->get_id(), '_fvg_auto_resize', true ) ? 'true' : 'false';
+
+			if ( ! empty( $video_url ) ) {
+				$html = str_replace( 'class="', 'class="fvg-video-thumbnail ', $html );
+				$data_attributes = sprintf(
+					' data-fvg-video-url="%s" data-fvg-auto-resize="%s" ',
+					esc_url( $video_url ),
+					esc_attr( $auto_resize )
+				);
+				$html = str_replace( '<a ', '<a' . $data_attributes, $html );
+			}
+		}
 		return $html;
 	}
-
-	$product_id         = $product->get_id();
-	$video_thumbnail_id = get_post_meta( $product_id, '_fvg_thumbnail_id', true );
-
-	// Only proceed if the current thumbnail is the one designated for the video.
-	if ( ! $video_thumbnail_id || (int) $attachment_id !== (int) $video_thumbnail_id ) {
-		return $html;
-	}
-
-	$video_id = get_post_meta( $product_id, '_fvg_video_id', true );
-	if ( ! $video_id ) {
-		return $html;
-	}
-
-	$video_url = wp_get_attachment_url( $video_id );
-	if ( ! $video_url ) {
-		return $html;
-	}
-
-	// Prepare data attributes.
-	$auto_resize_val = get_post_meta( $product_id, '_fvg_auto_resize', true ) === 'yes' ? 'yes' : 'no';
-	$data_attrs      = sprintf(
-		'href="javascript:void(0);" class="fvg-video-link" data-fvg-video-url="%s" data-fvg-auto-resize="%s"',
-		esc_url( $video_url ),
-		esc_attr( $auto_resize_val )
-	);
-
-	// Add a target class to the parent <li> for reliable CSS and JS targeting.
-	$html = str_replace( '<li class="', '<li class="flatsome-video-gallery-item ', $html );
-
-	// Replace the original anchor tag's attributes with our custom ones.
-	$html = preg_replace( '/<a\s+href="[^"]*"/i', '<a ' . $data_attrs, $html );
-
-	return $html;
 }
-add_filter( 'woocommerce_single_product_image_thumbnail_html', 'fvg_modify_thumbnail_html', 20, 2 );
 
+Flatsome_Product_Gallery_Video::get_instance();
