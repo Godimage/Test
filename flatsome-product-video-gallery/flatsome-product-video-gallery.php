@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Flatsome Product Video Gallery
  * Description:       Adds a video upload feature to the WooCommerce product gallery for the Flatsome theme.
- * Version:           1.0
+ * Version:           1.1
  * Author:            Neo
  * License:           GPLv2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -13,6 +13,35 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+/*
+ * ========================================================================
+ *  Plugin File Structure
+ * ========================================================================
+ *
+ * flatsome-product-video-gallery/
+ * |
+ * |- flatsome-product-video-gallery.php (This file)
+ * |
+ * |- includes/
+ * |  |- class-fpvg-admin.php       (Handles admin-side functionality)
+ * |  |- class-fpvg-frontend.php    (Handles front-end display logic)
+ * |
+ * |- admin/
+ * |  |- css/
+ * |  |  |- fpvg-admin.css          (Styles for the admin metabox)
+ * |  |
+ * |  |- js/
+ * |     |- fpvg-admin.js           (JavaScript for the admin media uploader)
+ * |
+ * |- public/
+ *    |- css/
+ *    |  |- fpvg-frontend.css       (Styles for the video on the product page)
+ *    |
+ *    |- js/
+ *       |- fpvg-frontend.js        (JavaScript for integrating the video)
+ *
+ */
 
 /**
  * Load plugin classes.

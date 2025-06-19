@@ -73,7 +73,7 @@ class FPVG_Admin {
 			<input type="hidden" id="fpvg_video_id" name="fpvg_video_id" value="<?php echo esc_attr( $video_id ); ?>" />
 
 			<!-- Video preview area -->
-			<div class="fpvg-video-preview-wrapper">
+			<div class="fpvg-video-preview-wrapper" style="<?php echo $video_id ? '' : 'display:none;'; ?>">
 				<?php if ( $video_url ) : ?>
 					<video src="<?php echo esc_url( $video_url ); ?>" controls style="width:100%; height:auto;"></video>
 				<?php endif; ?>
@@ -166,24 +166,20 @@ class FPVG_Admin {
 		// Enqueue the WordPress media uploader scripts.
 		wp_enqueue_media();
 
-		// Enqueue scripts and styles for video preview.
-		wp_enqueue_style( 'wp-mediaelement' );
-		wp_enqueue_script( 'wp-mediaelement' );
-
 		// Enqueue custom plugin admin stylesheet.
 		wp_enqueue_style(
 			'fpvg-admin-css',
 			plugin_dir_url( __FILE__ ) . '../admin/css/fpvg-admin.css',
 			array(),
-			'1.0'
+			'1.1'
 		);
 
 		// Enqueue custom plugin admin script.
 		wp_enqueue_script(
 			'fpvg-admin-js',
 			plugin_dir_url( __FILE__ ) . '../admin/js/fpvg-admin.js',
-			array( 'jquery', 'wp-mediaelement' ),
-			'1.0',
+			array( 'jquery' ),
+			'1.1',
 			true // Load in the footer.
 		);
 	}

@@ -5,7 +5,7 @@
  * on the WooCommerce product edit screen, ensuring a clean and
  * consistent user interface within the WordPress admin panel.
  *
- * @version 1.0
+ * @version 1.1
  */
 
 /*
@@ -29,7 +29,6 @@
     background-color: #f0f0f1;
     padding: 5px;
     box-sizing: border-box;
-    /* The wrapper is hidden/shown by JS. No display property needed here. */
 }
 
 .fpvg-video-preview-wrapper video {
@@ -46,16 +45,6 @@
 .fpvg-buttons {
     display: flex;
     gap: 8px; /* Provides space between the Upload and Remove buttons */
-}
-
-/*
- * Remove Video Button Default State
- * This button is hidden by default as per the design.
- * The `fpvg-admin.js` script handles toggling its visibility
- * based on whether a video is currently set.
- */
-#fpvg_remove_video_button {
-    display: none;
 }
 
 /*
