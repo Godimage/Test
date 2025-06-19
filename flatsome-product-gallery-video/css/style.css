@@ -1,0 +1,111 @@
+/**
+ * Flatsome Product Gallery Video - Frontend Styles
+ *
+ * @version 5.0.0
+ * @author  Expert Analyst
+ *
+ * This file contains the styles for two key features:
+ * 1. An overlay on the video thumbnail to distinguish it from regular images.
+ * 2. Responsive styles for the video player when it's injected into the main gallery view.
+ */
+
+/* ==========================================================================
+   1. Video Thumbnail Overlay Styles
+   ========================================================================== */
+
+/**
+ * The `.fvg-video-link` is the anchor tag wrapping the video thumbnail.
+ * We set its position to relative to serve as a container for the absolutely
+ * positioned pseudo-elements (the overlay and play icon).
+ */
+.flatsome-video-gallery-item .fvg-video-link {
+    position: relative;
+    display: block;
+    cursor: pointer;
+}
+
+/**
+ * Creates a semi-transparent dark overlay using the ::before pseudo-element.
+ * This darkens the thumbnail image, helping the white play icon stand out.
+ * The transition provides a smooth effect on hover.
+ */
+.flatsome-video-gallery-item .fvg-video-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    opacity: 1;
+    transition: background-color 0.3s ease;
+    z-index: 1; /* Places overlay above the image but below the play icon */
+}
+
+/**
+ * The play icon itself, created with the ::after pseudo-element.
+ * It's centered using absolute positioning and transform.
+ * The icon is an embedded SVG for crisp rendering at any size.
+ */
+.flatsome-video-gallery-item .fvg-video-link::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 32px; /* A balanced size for most thumbnail dimensions */
+    height: 32px;
+    background-color: rgba(0, 0, 0, 0.5);
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjZmZmIj48cGF0aCBkPSJNOCA1djE0bDEwLjUtN3oiLz48L3N2Zz4=');
+    background-size: 55%;
+    background-position: center 50%;
+    background-repeat: no-repeat;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    opacity: 0.9;
+    transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.3s ease;
+    z-index: 2; /* Ensures the icon is the topmost element */
+}
+
+/**
+ * Hover Effects
+ * When a user hovers over the thumbnail, the overlay darkens and the
+ * play icon scales up, providing clear visual feedback.
+ */
+.flatsome-video-gallery-item .fvg-video-link:hover::before {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.flatsome-video-gallery-item .fvg-video-link:hover::after {
+    transform: translate(-50%, -50%) scale(1.15);
+    background-color: rgba(0, 0, 0, 0.7);
+    opacity: 1;
+}
+
+
+/* ==========================================================================
+   2. Injected Video Player Styles
+   ========================================================================== */
+
+/**
+ * Base styling for the injected video player.
+ * It ensures the video fills the container provided by the Flatsome gallery.
+ * The default object-fit is 'contain', which ensures the entire video is
+ * visible, letterboxing (black bars) if the aspect ratio doesn't match the container.
+ */
+.fpgv-injected-video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+}
+
+/**
+ * This class is added when the "Auto-resize video (cover area)" option is enabled.
+ * It overrides the default `object-fit` property. 'cover' scales the video to
+ * completely fill the container while preserving its aspect ratio, cropping
+ * any excess from the sides or top/bottom. This creates a seamless, "full-frame" look.
+ */
+.fpgv-injected-video.yes {
+    object-fit: cover;
+}
