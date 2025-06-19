@@ -1,0 +1,188 @@
+/**
+ * Flatsome Product Video Gallery - Frontend Styles
+ * Responsive CSS for video gallery integration with Flatsome theme
+ */
+
+/* ==========================================================================
+   Video Container Styles - Flatsome Integration
+   ========================================================================== */
+
+.fpvg-video-item {
+    position: relative;
+    display: block;
+    overflow: hidden;
+}
+
+.fpvg-video-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: #000;
+    overflow: hidden;
+}
+
+.fpvg-gallery-video {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+    max-width: 100%;
+}
+
+/* ==========================================================================
+   Video Overlay and Controls
+   ========================================================================== */
+
+.fpvg-video-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    pointer-events: none;
+}
+
+.fpvg-video-overlay.active {
+    pointer-events: all;
+}
+
+.fpvg-play-button {
+    background: rgba(0, 0, 0, 0.7);
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    pointer-events: all;
+}
+
+.fpvg-play-button:hover {
+    background: rgba(0, 0, 0, 0.9);
+    transform: scale(1.1);
+}
+
+.fpvg-play-icon,
+.fpvg-pause-icon {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
+
+/* ==========================================================================
+   Flatsome Gallery Integration
+   ========================================================================== */
+
+/* Make videos fit into Flatsome's gallery structure */
+.woocommerce-product-gallery .fpvg-video-item {
+    background: #f8f8f8;
+}
+
+.woocommerce-product-gallery .fpvg-video-item a {
+    display: block;
+    position: relative;
+    text-decoration: none;
+}
+
+.woocommerce-product-gallery .fpvg-video-item .fpvg-video-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; /* Square aspect ratio by default */
+    height: 0;
+    overflow: hidden;
+}
+
+.woocommerce-product-gallery .fpvg-video-item .fpvg-gallery-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .fpvg-play-button {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .fpvg-play-icon,
+    .fpvg-pause-icon {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .fpvg-play-button {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .fpvg-play-icon,
+    .fpvg-pause-icon {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+/* ==========================================================================
+   Accessibility
+   ========================================================================== */
+
+.fpvg-play-button:focus {
+    outline: 2px solid #0073aa;
+    outline-offset: 2px;
+}
+
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* ==========================================================================
+   Video Playing State
+   ========================================================================== */
+
+.fpvg-video-item.playing .fpvg-video-overlay {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.fpvg-video-item.playing .fpvg-gallery-video {
+    cursor: pointer;
+}
+
+/* ==========================================================================
+   Lightbox Prevention
+   ========================================================================== */
+
+.fpvg-video-link {
+    pointer-events: none;
+}
+
+.fpvg-video-item .fpvg-video-container {
+    pointer-events: all;
+}
+
+.fpvg-video-item .fpvg-play-button {
+    pointer-events: all;
+}
+

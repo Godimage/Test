@@ -15,8 +15,8 @@ class FPVG_Frontend {
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_scripts'));
         add_action('wp_footer', array($this, 'add_video_gallery_scripts'));
         
-        // Modify Flatsome gallery output
-        add_filter('flatsome_wc_get_gallery_image_html', array($this, 'modify_gallery_html'), 10, 3);
+        // Use the correct WooCommerce hook for adding videos to gallery
+        add_action('woocommerce_product_thumbnails', array($this, 'add_videos_to_gallery'), 20);
         
         // Add video data to product page
         add_action('woocommerce_single_product_summary', array($this, 'add_video_data_script'), 5);
@@ -31,7 +31,7 @@ class FPVG_Frontend {
         }
         
         global $product;
-        if (!$product || !FPVG_Gallery_Integration::product_has_videos($product->get_id())) {
+        if (empty($product) || !($product instanceof WC_Product) || !FPVG_Gallery_Integration::product_has_videos($product->get_id())) {
             return;
         }
         
@@ -69,19 +69,19 @@ class FPVG_Frontend {
     }
     
     /**
-     * Modify Flatsome gallery HTML to include videos
+     * Add videos to product gallery
      */
-    public function modify_gallery_html($html, $attachment_id, $main_image) {
+    public function add_videos_to_gallery() {
         global $product;
         
-        if (!$product) {
-            return $html;
+        if (empty($product) || !($product instanceof WC_Product)) {
+            return;
         }
         
         // Get product videos
         $videos = get_post_meta($product->get_id(), '_product_videos', true);
         if (empty($videos) || !is_array($videos)) {
-            return $html;
+            return;
         }
         
         // Sort videos by position
@@ -91,11 +91,8 @@ class FPVG_Frontend {
         
         // Add videos to gallery
         foreach ($videos as $index => $video) {
-            $video_html = $this->generate_video_gallery_item($video, $index);
-            $html .= $video_html;
+            echo $this->generate_video_gallery_item($video, $index);
         }
-        
-        return $html;
     }
     
     /**
@@ -105,39 +102,41 @@ class FPVG_Frontend {
         $video_id = 'fpvg-video-' . uniqid();
         $poster_url = $this->get_video_poster($video);
         
-        $html = '<div class="woocommerce-product-gallery__image fpvg-video-item" data-video-index="' . esc_attr($index) . '" data-video-position="' . esc_attr($video['position']) . '">';
+        // Create video thumbnail for gallery
+        $video_thumb = $poster_url ? $poster_url : $video['url'] . '#t=0.1';
         
-        // Video element
+        // Generate HTML that matches Flatsome's gallery structure
+        $html = '<div data-thumb="' . esc_url($video_thumb) . '" data-thumb-alt="Video" class="woocommerce-product-gallery__image slide fpvg-video-item" data-video-index="' . esc_attr($index) . '" data-video-position="' . esc_attr($video['position']) . '">';
+        
+        $html .= '<a href="#" class="fpvg-video-link" data-video-url="' . esc_url($video['url']) . '">';
+        
+        // Video element for main gallery
         $html .= '<div class="fpvg-video-container">';
-        $html .= '<video id="' . esc_attr($video_id) . '" class="fpvg-gallery-video" preload="metadata" muted playsinline';
+        $html .= '<video id="' . esc_attr($video_id) . '" class="fpvg-gallery-video wp-post-image" preload="metadata" muted playsinline';
         
         if ($poster_url) {
             $html .= ' poster="' . esc_url($poster_url) . '"';
         }
         
-        $html .= '>';
+        $html .= ' style="width: 100%; height: auto; object-fit: cover;">';
         $html .= '<source src="' . esc_url($video['url']) . '" type="video/' . esc_attr($video['type']) . '">';
         $html .= __('Your browser does not support the video tag.', 'flatsome-product-video-gallery');
         $html .= '</video>';
         
         // Video controls overlay
-        $html .= '<div class="fpvg-video-overlay">';
-        $html .= '<button class="fpvg-play-button" data-video-id="' . esc_attr($video_id) . '" aria-label="' . __('Play video', 'flatsome-product-video-gallery') . '">';
-        $html .= '<svg class="fpvg-play-icon" viewBox="0 0 24 24" fill="currentColor">';
+        $html .= '<div class="fpvg-video-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10;">';
+        $html .= '<button class="fpvg-play-button" data-video-id="' . esc_attr($video_id) . '" aria-label="' . __('Play video', 'flatsome-product-video-gallery') . '" style="background: rgba(0,0,0,0.7); border: none; border-radius: 50%; width: 60px; height: 60px; color: white; cursor: pointer;">';
+        $html .= '<svg class="fpvg-play-icon" viewBox="0 0 24 24" fill="currentColor" style="width: 24px; height: 24px;">';
         $html .= '<path d="M8 5v14l11-7z"/>';
         $html .= '</svg>';
-        $html .= '<svg class="fpvg-pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none;">';
+        $html .= '<svg class="fpvg-pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none; width: 24px; height: 24px;">';
         $html .= '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
         $html .= '</svg>';
         $html .= '</button>';
         $html .= '</div>';
         
-        // Video info (hidden, for accessibility)
-        $html .= '<span class="fpvg-video-info sr-only">';
-        $html .= sprintf(__('Video %d of %d', 'flatsome-product-video-gallery'), $index + 1, count($this->get_all_videos()));
-        $html .= '</span>';
-        
         $html .= '</div>';
+        $html .= '</a>';
         $html .= '</div>';
         
         return $html;
@@ -205,7 +204,7 @@ class FPVG_Frontend {
         }
         
         global $product;
-        if (!$product || !FPVG_Gallery_Integration::product_has_videos($product->get_id())) {
+        if (empty($product) || !($product instanceof WC_Product) || !FPVG_Gallery_Integration::product_has_videos($product->get_id())) {
             return;
         }
         
